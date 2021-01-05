@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-This is a NodeServer for Twinkly Protocol V6 written by automationgeek (Jean-Francois Tremblay)
+This is a NodeServer for Twinkly written by automationgeek (Jean-Francois Tremblay)
 based on the NodeServer template for Polyglot v2 written in Python2/3 by Einstein.42 (James Milne) milne.james@gmail.com
 """
 
@@ -86,8 +86,8 @@ class Controller(polyinterface.Controller):
     def discover(self, *args, **kwargs):
         time.sleep(1)
         count = 1
-        for myHost in self.milight_host.split(','):
-            uniq_name = light' + "_" + myHost.replace(".","") + "_" + str(count)
+        for myHost in self.twinkly_host.split(','):
+            uniq_name = twinkly' + "_" + myHost.replace(".","") + "_" + str(count)
             self.addNode(Twinkly_Light(self, uniq_name , uniq_name, myHost ))
             time.sleep(1)
             count = count + 1
