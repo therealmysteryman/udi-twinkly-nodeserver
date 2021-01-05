@@ -9,7 +9,7 @@ import polyinterface
 import time
 import json
 import sys
-import TwinklyClient
+from twinkly_client import TwinklyClient
 from copy import deepcopy
 
 LOGGER = polyinterface.LOGGER
