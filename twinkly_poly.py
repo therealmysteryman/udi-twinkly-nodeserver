@@ -127,7 +127,7 @@ class TwinklyLight(polyinterface.Node):
 
         super(TwinklyLight, self).__init__(controller, primary, address, name)
         self.queryON = True
-        self.myHost, self.mac = hostmac.split(':'):
+        self.myHost, self.mac = hostmac.split(';'):
         self.myTwinkly = xled.ControlInterface(self.myHost, self.mac)
 
     def start(self):
