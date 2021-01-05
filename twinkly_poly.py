@@ -10,7 +10,7 @@ import hashlib
 import time
 import json
 import sys
-from twinkly_client import TwinklyClient
+import xled
 from copy import deepcopy
 
 LOGGER = polyinterface.LOGGER
@@ -35,7 +35,7 @@ class Controller(polyinterface.Controller):
         self.name = 'Twinkly'
         self.initialized = False
         self.queryON = False
-        self.twinkly_host = ""
+        self.hostmac = ""
         self.tries = 0
         self.hb = 0
 
@@ -43,13 +43,13 @@ class Controller(polyinterface.Controller):
         LOGGER.info('Started Twinkly for v2 NodeServer version %s', str(VERSION))
         self.setDriver('ST', 0)
         try:
-            if 'host' in self.polyConfig['customParams']:
-                self.twinkly_host = self.polyConfig['customParams']['host']
+            if 'hostmac' in self.polyConfig['customParams']:
+                self.hostmac = self.polyConfig['customParams']['hostmac']
             else:
-                self.twinkly_host = ""
+                self.hostmac = ""
 
-            if self.twinkly_host == "" :
-                LOGGER.error('Twinkly requires \'host\' parameters to be specified in custom configuration.')
+            if self.hostmac == "" :
+                LOGGER.error('Twinkly requires \'hostmac\' parameters to be specified in custom configuration.')
                 return False
             else:
                 self.check_profile()
@@ -84,10 +84,10 @@ class Controller(polyinterface.Controller):
 
     def discover(self, *args, **kwargs):
         count = 1
-        for myHost in self.twinkly_host.split(','):
-            uniq_name = "t" + "_" + myHost.replace(".","") + "_" + str(count)
+        for hostmac in self.twinkly_host.split(','):
+            uniq_name = "t" + "_" + hostmac.replace(".","") + "_" + str(count)
             myhash =  str(int(hashlib.md5(uniq_name.encode('utf8')).hexdigest(), 16) % (10 ** 8))
-            self.addNode(TwinklyLight(self,myhash, uniq_name , uniq_name, myHost ))
+            self.addNode(TwinklyLight(self,myhash, uniq_name , uniq_name, hostmac ))
             count = count + 1
 
     def delete(self):
@@ -123,39 +123,36 @@ class Controller(polyinterface.Controller):
 
 class TwinklyLight(polyinterface.Node):
 
-    def __init__(self, controller, primary, address, name, host):
+    def __init__(self, controller, primary, address, name, hostmac):
 
         super(TwinklyLight, self).__init__(controller, primary, address, name)
         self.queryON = True
-        #self.myTwinkly = TwinklyClient(host)
+        self.myHost, self.mac = hostmac.split(':'):
+        self.myTwinkly = xled.ControlInterface(self.myHost, self.mac)
 
     def start(self):
-        #self.query()
-        pass
+        self.query()
 
     def setOn(self, command):
-        #self.myTwinkly.set_is_on(True)
-        #self.setDriver('ST', 100,True)
-        pass
+        self.myTwinkly.set_mode('movie')
+        self.setDriver('ST', 100,True)
         
     def setOff(self, command):
-        #self.myTwinkly.set_is_on(True)
-        #self.setDriver('ST', 0,True)
-        pass
+        self.myTwinkly.set_mode('off')
+        self.setDriver('ST', 0,True)
         
     def setBrightness(self, command):
-        #intBri = int(command.get('value'))
-        #self.myTwinkly.set_brightness(intBri)
-        #self.setDriver('GV1', intBri,True)
-        pass
+        intBri = int(command.get('value'))
+        self.myTwinkly.set_brightness(intBri)
+        self.setDriver('GV1', intBri,True)
  
     def query(self):
-        #if ( self.myTwinkly.get_is_on() == True ) :
-        #   self.setDriver('ST', 100,True) 
-        #else :
-        #   self.setDriver('ST', 0,True) 
+        if ( self.myTwinkly.getMode() != 'off' ) :
+           self.setDriver('ST', 100,True) 
+        else :
+           self.setDriver('ST', 0,True) 
         
-        #self.setDriver('GV1', self.myTwinkly.get_brightness() , True)
+        self.setDriver('GV1', self.myTwinkly.get_brightness() , True)
         pass
                         
     drivers = [{'driver': 'ST', 'value': 0, 'uom': 78},
