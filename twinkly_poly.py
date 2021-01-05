@@ -84,12 +84,11 @@ class Controller(polyinterface.Controller):
             self.hb = 0
 
     def discover(self, *args, **kwargs):
-        time.sleep(1)
         count = 1
         for myHost in self.twinkly_host.split(','):
-            uniq_name = "twinkly" + "_" + myHost.replace(".","") + "_" + str(count)
-            self.addNode(TwinklyLight(self, uniq_name , uniq_name, myHost ))
-            time.sleep(1)
+            uniq_name = "t" + "_" + myHost.replace(".","") + "_" + str(count)
+            myhash =  str(int(hashlib.md5(uniq_name.encode('utf8')).hexdigest(), 16) % (10 ** 8))
+            self.addNode(TwinklyLight(self,myhash, uniq_name , uniq_name, myHost ))
             count = count + 1
 
     def delete(self):
