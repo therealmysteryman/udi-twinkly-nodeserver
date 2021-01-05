@@ -43,9 +43,9 @@ class Controller(polyinterface.Controller):
         self.setDriver('ST', 0)
         try:
             if 'host' in self.polyConfig['customParams']:
-                self.milight_host = self.polyConfig['customParams']['host']
+                self.twinkly_host = self.polyConfig['customParams']['host']
             else:
-                self.milight_host = ""
+                self.twinkly_host = ""
 
 
             if self.milight_host == "" :
