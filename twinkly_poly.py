@@ -6,6 +6,7 @@ based on the NodeServer template for Polyglot v2 written in Python2/3 by Einstei
 """
 
 import polyinterface
+import hashlib
 import time
 import json
 import sys
@@ -126,31 +127,36 @@ class TwinklyLight(polyinterface.Node):
 
         super(TwinklyLight, self).__init__(controller, primary, address, name)
         self.queryON = True
-        self.myTwinkly = TwinklyClient(host)
+        #self.myTwinkly = TwinklyClient(host)
 
     def start(self):
-        self.query()
+        #self.query()
+        pass
 
     def setOn(self, command):
-        self.myTwinkly.set_is_on(True)
-        self.setDriver('ST', 100,True)
+        #self.myTwinkly.set_is_on(True)
+        #self.setDriver('ST', 100,True)
+        pass
         
     def setOff(self, command):
-        self.myTwinkly.set_is_on(True)
-        self.setDriver('ST', 0,True)
+        #self.myTwinkly.set_is_on(True)
+        #self.setDriver('ST', 0,True)
+        pass
         
     def setBrightness(self, command):
-        intBri = int(command.get('value'))
-        self.myTwinkly.set_brightness(intBri)
-        self.setDriver('GV1', intBri,True)
+        #intBri = int(command.get('value'))
+        #self.myTwinkly.set_brightness(intBri)
+        #self.setDriver('GV1', intBri,True)
+        pass
  
     def query(self):
-        if ( self.myTwinkly.get_is_on() == True ) :
-           self.setDriver('ST', 100,True) 
-        else :
-           self.setDriver('ST', 0,True) 
+        #if ( self.myTwinkly.get_is_on() == True ) :
+        #   self.setDriver('ST', 100,True) 
+        #else :
+        #   self.setDriver('ST', 0,True) 
         
-        self.setDriver('GV1', self.myTwinkly.get_brightness() , True)
+        #self.setDriver('GV1', self.myTwinkly.get_brightness() , True)
+        pass
                         
     drivers = [{'driver': 'ST', 'value': 0, 'uom': 78},
                {'driver': 'GV1', 'value': 0, 'uom': 51}]
