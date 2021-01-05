@@ -87,7 +87,7 @@ class Controller(polyinterface.Controller):
         time.sleep(1)
         count = 1
         for myHost in self.twinkly_host.split(','):
-            uniq_name = twinkly' + "_" + myHost.replace(".","") + "_" + str(count)
+            uniq_name = "twinkly" + "_" + myHost.replace(".","") + "_" + str(count)
             self.addNode(Twinkly_Light(self, uniq_name , uniq_name, myHost ))
             time.sleep(1)
             count = count + 1
