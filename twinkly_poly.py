@@ -47,19 +47,17 @@ class Controller(polyinterface.Controller):
             else:
                 self.twinkly_host = ""
 
-
-            if self.milight_host == "" :
+            if self.twinkly_host == "" :
                 LOGGER.error('Twinkly requires \'host\' parameters to be specified in custom configuration.')
                 return False
             else:
+                self.check_profile()
                 self.discover()
                 self.query()
 
         except Exception as ex:
             LOGGER.error('Error starting Twinkly NodeServer: %s', str(ex))
-            
-        self.check_profile()
-        self.heartbeat()
+           
 
     def shortPoll(self):
         self.query()
