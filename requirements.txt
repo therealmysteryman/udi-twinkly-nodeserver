@@ -1,2 +1,2 @@
 polyinterface>=2.0.19
-xled>=0.6.1
+twinkly-client
