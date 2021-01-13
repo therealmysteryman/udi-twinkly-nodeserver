@@ -10,8 +10,8 @@ import hashlib
 import time
 import json
 import sys
-import xled
 from copy import deepcopy
+from twinkly_client import TwinklyClient
 
 LOGGER = polyinterface.LOGGER
 SERVERDATA = json.load(open('server.json'))
@@ -35,7 +35,7 @@ class Controller(polyinterface.Controller):
         self.name = 'Twinkly'
         self.initialized = False
         self.queryON = False
-        self.hostmac = ""
+        self.host = ""
         self.tries = 0
         self.hb = 0
 
@@ -43,13 +43,13 @@ class Controller(polyinterface.Controller):
         LOGGER.info('Started Twinkly for v2 NodeServer version %s', str(VERSION))
         self.setDriver('ST', 0)
         try:
-            if 'hostmac' in self.polyConfig['customParams']:
-                self.hostmac = self.polyConfig['customParams']['hostmac']
+            if 'host' in self.polyConfig['customParams']:
+                self.host = self.polyConfig['customParams']['host']
             else:
-                self.hostmac = ""
+                self.host = ""
 
-            if self.hostmac == "" :
-                LOGGER.error('Twinkly requires \'hostmac\' parameters to be specified in custom configuration.')
+            if self.host == "" :
+                LOGGER.error('Twinkly requires \'host\' parameters to be specified in custom configuration.')
                 return False
             else:
                 self.check_profile()
@@ -84,10 +84,10 @@ class Controller(polyinterface.Controller):
 
     def discover(self, *args, **kwargs):
         count = 1
-        for hostmac in self.twinkly_host.split(','):
+        for host in self.host.split(','):
             uniq_name = "t" + "_" + hostmac.replace(".","") + "_" + str(count)
             myhash =  str(int(hashlib.md5(uniq_name.encode('utf8')).hexdigest(), 16) % (10 ** 8))
-            self.addNode(TwinklyLight(self,myhash, uniq_name , uniq_name, hostmac ))
+            self.addNode(TwinklyLight(self,myhash, uniq_name , uniq_name, host ))
             count = count + 1
 
     def delete(self):
@@ -123,37 +123,59 @@ class Controller(polyinterface.Controller):
 
 class TwinklyLight(polyinterface.Node):
 
-    def __init__(self, controller, primary, address, name, hostmac):
+    def __init__(self, controller, primary, address, name, host):
 
         super(TwinklyLight, self).__init__(controller, primary, address, name)
         self.queryON = True
-        self.myHost, self.mac = hostmac.split(';')
-        self.myTwinkly = xled.ControlInterface(self.myHost, self.mac)
+        self.myHost = host
 
     def start(self):
-        self.query()
+        pass
 
     def setOn(self, command):
-        self.myTwinkly.set_mode('movie')
         self.setDriver('ST', 100,True)
         
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(TwinklyClient(self.myHost).set_is_on(True))
+        loop.close()
+
+        
     def setOff(self, command):
-        self.myTwinkly.set_mode('off')
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(TwinklyClient(self.myHost).set_is_on(False))
+        loop.close()
         self.setDriver('ST', 0,True)
         
     def setBrightness(self, command):
         intBri = int(command.get('value'))
-        self.myTwinkly.set_brightness(intBri)
+        
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(TwinklyClient(self.myHost).set_brightness(intBri))
+        loop.close()
+        
         self.setDriver('GV1', intBri,True)
  
     def query(self):
-        if ( self.myTwinkly.getMode() != 'off' ) :
+        
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(bLightOn = TwinklyClient(self.myHost).get_is_on())
+        loop.close()
+        
+        if ( bLightOn ) :
            self.setDriver('ST', 100,True) 
         else :
            self.setDriver('ST', 0,True) 
         
-        self.setDriver('GV1', self.myTwinkly.get_brightness() , True)
-        pass
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(intBri = TwinklyClient(self.myHost).get_brightness())
+        loop.close()
+        
+        self.setDriver('GV1', intBri , True)
                         
     drivers = [{'driver': 'ST', 'value': 0, 'uom': 78},
                {'driver': 'GV1', 'value': 0, 'uom': 51}]
