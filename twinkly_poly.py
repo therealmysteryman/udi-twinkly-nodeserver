@@ -7,6 +7,7 @@ based on the NodeServer template for Polyglot v2 written in Python2/3 by Einstei
 
 import polyinterface
 import hashlib
+import asyncio
 import time
 import json
 import sys
@@ -85,7 +86,7 @@ class Controller(polyinterface.Controller):
     def discover(self, *args, **kwargs):
         count = 1
         for host in self.host.split(','):
-            uniq_name = "t" + "_" + hostmac.replace(".","") + "_" + str(count)
+            uniq_name = "t" + "_" + host.replace(".","") + "_" + str(count)
             myhash =  str(int(hashlib.md5(uniq_name.encode('utf8')).hexdigest(), 16) % (10 ** 8))
             self.addNode(TwinklyLight(self,myhash, uniq_name , uniq_name, host ))
             count = count + 1
