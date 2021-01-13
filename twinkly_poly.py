@@ -163,18 +163,24 @@ class TwinklyLight(polyinterface.Node):
         
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        loop.run_until_complete(bLightOn = TwinklyClient(self.myHost).get_is_on())
+        tasks2 = [ TwinklyClient(self.myHost).get_is_on() ]
+        bLightOn = loop.run_until_complete(asyncio.gather(*tasks2))
         loop.close()
-        
-        if ( bLightOn ) :
-           self.setDriver('ST', 100,True) 
+        print (bLightOn)
+
+        if ( bLightOn is True ) :
+           self.setDriver('ST', 100,True)
         else :
-           self.setDriver('ST', 0,True) 
-        
+           self.setDriver('ST', 0,True)
+
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        loop.run_until_complete(intBri = TwinklyClient(self.myHost).get_brightness())
+        tasks = [ TwinklyClient(self.myHost).get_brightness() ]
+        intBri = loop.run_until_complete(asyncio.gather(*tasks))
         loop.close()
+
+        self.setDriver('GV1', intBri , True)
+
         
         self.setDriver('GV1', intBri , True)
                         
