@@ -88,7 +88,7 @@ class Controller(polyinterface.Controller):
         for host in self.host.split(','):
             uniq_name = "t" + "_" + host.replace(".","") + "_" + str(count)
             myhash =  str(int(hashlib.md5(uniq_name.encode('utf8')).hexdigest(), 16) % (10 ** 8))
-            self.addNode(TwinklyLight(self,myhash, uniq_name , uniq_name, host ))
+            self.addNode(TwinklyLight(self,self.address, myhash , uniq_name, host ))
             count = count + 1
 
     def delete(self):
