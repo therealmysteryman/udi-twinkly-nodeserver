@@ -8,6 +8,7 @@ based on the NodeServer template for Polyglot v2 written in Python2/3 by Einstei
 import polyinterface
 import hashlib
 import asyncio
+import warnings 
 import time
 import json
 import sys
@@ -56,6 +57,8 @@ class Controller(polyinterface.Controller):
                 self.check_profile()
                 self.discover()
                 self.query()
+
+
 
         except Exception as ex:
             LOGGER.error('Error starting Twinkly NodeServer: %s', str(ex))
@@ -134,56 +137,69 @@ class TwinklyLight(polyinterface.Node):
         pass
 
     def setOn(self, command):
-        self.setDriver('ST', 100,True)
-        
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(TwinklyClient(self.myHost).set_is_on(True))
-        loop.close()
 
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(TwinklyClient(self.myHost).set_is_on(True))
+            loop.close()
+            self.setDriver('ST', 100,True)
+        except Exception as ex :
+            pass
+        
+        self.reportDrivers()
         
     def setOff(self, command):
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(TwinklyClient(self.myHost).set_is_on(False))
-        loop.close()
-        self.setDriver('ST', 0,True)
+
+        try :
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(TwinklyClient(self.myHost).set_is_on(False))
+            loop.close()
+            self.setDriver('ST', 0,True)
+        except Exception as ex :
+            pass
+       
+        self.reportDrivers()
         
     def setBrightness(self, command):
         intBri = int(command.get('value'))
         
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(TwinklyClient(self.myHost).set_brightness(intBri))
-        loop.close()
-        
-        self.setDriver('GV1', intBri,True)
- 
+        try :
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(TwinklyClient(self.myHost).set_brightness(intBri))
+            loop.close()
+            self.setDriver('GV1', intBri,True)
+
+        except Exception as ex :
+            pass
+
+        self.reportDrivers()
+
     def query(self):
-        
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        tasks2 = [ TwinklyClient(self.myHost).get_is_on() ]
-        bLightOn = loop.run_until_complete(asyncio.gather(*tasks2))
-        loop.close()
-        print (bLightOn)
+            try :
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                tasks2 = [ TwinklyClient(self.myHost).get_is_on() ]
+                bLightOn = loop.run_until_complete(asyncio.gather(*tasks2))
+                loop.close()
+                if ( bLightOn is True ) :
+                    self.setDriver('ST', 100,True)
+                else :
+                    self.setDriver('ST', 0,True)
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                tasks = [ TwinklyClient(self.myHost).get_brightness() ]
+                intBri = loop.run_until_complete(asyncio.gather(*tasks))
+                loop.close()
 
-        if ( bLightOn is True ) :
-           self.setDriver('ST', 100,True)
-        else :
-           self.setDriver('ST', 0,True)
-
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        tasks = [ TwinklyClient(self.myHost).get_brightness() ]
-        intBri = loop.run_until_complete(asyncio.gather(*tasks))
-        loop.close()
-
-        self.setDriver('GV1', intBri , True)
-
-        
-        self.setDriver('GV1', intBri , True)
+                self.setDriver('GV1', intBri , True)
+            except Exception as ex:
+                pass
                         
+            self.reportDrivers()
+
     drivers = [{'driver': 'ST', 'value': 0, 'uom': 78},
                {'driver': 'GV1', 'value': 0, 'uom': 51}]
 
@@ -196,6 +212,8 @@ class TwinklyLight(polyinterface.Node):
 
 if __name__ == "__main__":
     try:
+        warnings.filterwarnings("ignore", category=ResourceWarning, message="unclosed.*")
+        warnings.filterwarnings("ignore", category=DeprecationWarning, message="The.*")
         polyglot = polyinterface.Interface('TwinklyNodeServer')
         polyglot.start()
         control = Controller(polyglot)
