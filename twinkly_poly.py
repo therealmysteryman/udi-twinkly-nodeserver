@@ -62,17 +62,14 @@ class Controller(polyinterface.Controller):
            
 
     def shortPoll(self):
-        self.query()
-
-    def longPoll(self):
-        self.heartbeat()
-
-    def query(self):
         self.setDriver('ST', 1)
         self.reportDrivers()
         for node in self.nodes:
             if  node != self.address and self.nodes[node].queryON == True :
                 self.nodes[node].query()
+
+    def longPoll(self):
+        self.heartbeat()
 
     def heartbeat(self):
         LOGGER.debug('heartbeat: hb={}'.format(self.hb))
