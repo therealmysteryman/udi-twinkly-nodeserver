@@ -68,6 +68,13 @@ class Controller(polyinterface.Controller):
             if  node != self.address and self.nodes[node].queryON == True :
                 self.nodes[node].query()
 
+    def query(self):
+        self.setDriver('ST', 1)
+        self.reportDrivers()
+        for node in self.nodes:
+            if  node != self.address and self.nodes[node].queryON == True :
+                self.nodes[node].query()
+                
     def longPoll(self):
         self.heartbeat()
 
