@@ -56,10 +56,7 @@ class Controller(polyinterface.Controller):
             else:
                 self.check_profile()
                 self.discover()
-                self.query()
-
-
-
+                
         except Exception as ex:
             LOGGER.error('Error starting Twinkly NodeServer: %s', str(ex))
            
@@ -178,10 +175,12 @@ class TwinklyLight(polyinterface.Node):
                 tasks2 = [ TwinklyClient(self.myHost).get_is_on() ]
                 bLightOn = loop.run_until_complete(asyncio.gather(*tasks2))
                 loop.close()
+                
                 if ( bLightOn is True ) :
                     self.setDriver('ST', 100,True)
                 else :
                     self.setDriver('ST', 0,True)
+                
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
                 tasks = [ TwinklyClient(self.myHost).get_brightness() ]
