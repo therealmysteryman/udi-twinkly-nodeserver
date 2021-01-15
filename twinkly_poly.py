@@ -65,17 +65,17 @@ class Controller(polyinterface.Controller):
            
 
     def shortPoll(self):
-        self.query()
+        pass
 
     def longPoll(self):
         self.heartbeat()
 
     def query(self):
         self.setDriver('ST', 1)
+        self.reportDrivers()
         for node in self.nodes:
             if self.nodes[node].queryON == True :
                 self.nodes[node].query()
-            self.nodes[node].reportDrivers()
 
     def heartbeat(self):
         LOGGER.debug('heartbeat: hb={}'.format(self.hb))
@@ -147,8 +147,6 @@ class TwinklyLight(polyinterface.Node):
         except Exception as ex :
             pass
         
-        self.reportDrivers()
-        
     def setOff(self, command):
 
         try :
@@ -159,9 +157,7 @@ class TwinklyLight(polyinterface.Node):
             self.setDriver('ST', 0,True)
         except Exception as ex :
             pass
-       
-        self.reportDrivers()
-        
+      
     def setBrightness(self, command):
         intBri = int(command.get('value'))
         
@@ -174,8 +170,6 @@ class TwinklyLight(polyinterface.Node):
 
         except Exception as ex :
             pass
-
-        self.reportDrivers()
 
     def query(self):
             try :
@@ -195,10 +189,10 @@ class TwinklyLight(polyinterface.Node):
                 loop.close()
 
                 self.setDriver('GV1', intBri , True)
+                
+                self.reportDrivers()
             except Exception as ex:
                 pass
-                        
-            self.reportDrivers()
 
     drivers = [{'driver': 'ST', 'value': 0, 'uom': 78},
                {'driver': 'GV1', 'value': 0, 'uom': 51}]
