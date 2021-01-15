@@ -4,7 +4,7 @@
     "type": "python3",
     "executable": "twinkly_poly.py",
     "install": "install.sh",
-    "shortPoll": "120",
+    "shortPoll": "300",
     "longPoll": "3600",
     "description": "Connect Twinkly Lighting system to the ISY994.",
     "notice": "https://github.com/therealmysteryman/udi-milight-polyglot/blob/master/LICENSE",
