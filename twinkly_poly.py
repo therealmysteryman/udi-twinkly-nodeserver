@@ -14,7 +14,7 @@ import json
 import sys
 from copy import deepcopy
 from twinkly_client import TwinklyClient
-from aiohttp import ClientResponseError, ClientSession, ClientTimeout
+from aiohttp import ClientSession, ClientTimeout
 
 LOGGER = polyinterface.LOGGER
 SERVERDATA = json.load(open('server.json'))
@@ -163,7 +163,7 @@ class TwinklyLight(polyinterface.Node):
         await cs.close()
         return intBri
     
-    async def _turnOff(self,cs) :
+    async def _turnOff(self) :
         cs = ClientSession(raise_for_status=True, timeout=ClientTimeout(total=3))
         tc = await TwinklyClient(self.myHost,cs).set_is_on(False)
         await cs.close()
