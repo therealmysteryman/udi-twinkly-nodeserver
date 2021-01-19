@@ -144,14 +144,18 @@ class TwinklyLight(polyinterface.Node):
     def setOff(self, command):
 
         try :
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.run_until_complete(TwinklyClient(self.myHost).set_is_on(False))
-            loop.close()
+            #loop = asyncio.new_event_loop()
+            #asyncio.set_event_loop(loop)
+            #loop.run_until_complete(TwinklyClient(self.myHost).set_is_on(False))
+            #loop.close()
+            asyncio.run(self.turnoff())
             self.setDriver('ST', 0,True)
         except Exception as ex :
             pass
-      
+        
+    async def turnoff(self) :
+        await TwinklyClient(self.myHost).set_is_on(False)
+        
     def setBrightness(self, command):
         intBri = int(command.get('value'))
         
