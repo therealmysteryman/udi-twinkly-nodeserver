@@ -14,7 +14,7 @@ import json
 import sys
 from copy import deepcopy
 from twinkly_client import TwinklyClient
-from aiohttp import ClientResponseError, ClientSession
+from aiohttp import ClientResponseError, ClientSession, ClientTimeout
 
 LOGGER = polyinterface.LOGGER
 SERVERDATA = json.load(open('server.json'))
