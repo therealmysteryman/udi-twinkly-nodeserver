@@ -14,6 +14,7 @@ import json
 import sys
 from copy import deepcopy
 from twinkly_client import TwinklyClient
+from aiohttp import ClientResponseError, ClientSession
 
 LOGGER = polyinterface.LOGGER
 SERVERDATA = json.load(open('server.json'))
@@ -151,19 +152,31 @@ class TwinklyLight(polyinterface.Node):
         self.reportDrivers()
 
     async def _isOn(self) : 
-        return await TwinklyClient(self.myHost).get_is_on()
+        cs = ClientSession(raise_for_status=True, timeout=ClientTimeout(total=3))
+        isOn = await TwinklyClient(self.myHost,cs).get_is_on()
+        await cs.close()
+        return isOn
         
     async def _getBri(self) : 
-        return await TwinklyClient(self.myHost).get_brightness()
-        
-    async def _turnOff(self) :
-        await TwinklyClient(self.myHost).set_is_on(False)
+        cs = ClientSession(raise_for_status=True, timeout=ClientTimeout(total=3))
+        intBri = await TwinklyClient(self.myHost,cs).get_brightness()
+        await cs.close()
+        return intBri
+    
+    async def _turnOff(self,cs) :
+        cs = ClientSession(raise_for_status=True, timeout=ClientTimeout(total=3))
+        tc = await TwinklyClient(self.myHost,cs).set_is_on(False)
+        await cs.close()
         
     async def _turnOn(self) :
-        await TwinklyClient(self.myHost).set_is_on(True)
+        cs = ClientSession(raise_for_status=True, timeout=ClientTimeout(total=3))
+        tc = await TwinklyClient(self.myHost,cs).set_is_on(True)
+        await cs.close()
         
     async def _setBrightness(self,bri) :
-        await TwinklyClient(self.myHost).set_brightness(bri)
+        cs = ClientSession(raise_for_status=True, timeout=ClientTimeout(total=3))
+        await TwinklyClient(self.myHost,cs).set_brightness(bri)
+        await cs.close()
             
     drivers = [{'driver': 'ST', 'value': 0, 'uom': 78},
                {'driver': 'GV1', 'value': 0, 'uom': 51}]
