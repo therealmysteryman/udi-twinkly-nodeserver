@@ -12,8 +12,8 @@
         {
             "title": "twinkly_nodeserver: A Polyglot v2 interface to Milight Protocol V6",
             "author": "AutomationGeek",
-            "version": "2.0.4",
-            "date": "January 15, 2021",
+            "version": "2.0.5",
+            "date": "January 18, 2021",
             "source": "https://github.com/therealmysteryman/udi-milight-polyglot",
             "license": "https://github.com/therealmysteryman/udi-milight-polyglot/blob/master/README.md"
         },
