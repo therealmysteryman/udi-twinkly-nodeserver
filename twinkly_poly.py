@@ -162,7 +162,7 @@ class TwinklyLight(polyinterface.Node):
     async def _turnOn(self) :
         await TwinklyClient(self.myHost).set_is_on(True)
         
-    async def _setBrightness(bri) :
+    async def _setBrightness(self,bri) :
         await TwinklyClient(self.myHost).set_brightness(bri)
             
     drivers = [{'driver': 'ST', 'value': 0, 'uom': 78},
