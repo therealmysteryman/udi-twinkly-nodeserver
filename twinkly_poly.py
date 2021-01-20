@@ -132,24 +132,36 @@ class TwinklyLight(polyinterface.Node):
         self.query()
 
     def setOn(self, command):
-        asyncio.run(self._turnOn())
-        self.setDriver('ST', 100,True)
+        try:
+            asyncio.run(self._turnOn())
+            self.setDriver('ST', 100,True)
+        except Exception as ex:
+            LOGGER.error('setOn: %s', str(ex))
         
     def setOff(self, command):
-        asyncio.run(self._turnOff())
-        self.setDriver('ST', 0,True)
+        try :
+            asyncio.run(self._turnOff())
+            self.setDriver('ST', 0,True)
+        except Exception as ex:
+            LOGGER.error('setOff: %s', str(ex))
     
     def setBrightness(self, command):
-        asyncio.run(self._setBrightness(int(command.get('value'))))
-        self.setDriver('GV1', int(command.get('value')),True)
+        try:
+            asyncio.run(self._setBrightness(int(command.get('value'))))
+            self.setDriver('GV1', int(command.get('value')),True)
+        except Exception as ex:
+            LOGGER.error('setBrightness: %s', str(ex))
         
     def query(self):
-        if ( asyncio.run(self._isOn()) ) :
-            self.setDriver('ST', 100,True)
-        else :
-            self.setDriver('ST', 0,True)
-        self.setDriver('GV1', asyncio.run(self._getBri()) , True)
-        self.reportDrivers()
+        try :
+            if ( asyncio.run(self._isOn()) ) :
+                self.setDriver('ST', 100,True)
+            else :
+                self.setDriver('ST', 0,True)
+            self.setDriver('GV1', asyncio.run(self._getBri()) , True)
+            self.reportDrivers()
+        except Exception as ex :
+            LOGGER.error('query: %s', str(ex))
 
     async def _isOn(self) : 
         cs = ClientSession(raise_for_status=True, timeout=ClientTimeout(total=3))
