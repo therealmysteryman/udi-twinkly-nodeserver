@@ -36,10 +36,8 @@ class Controller(polyinterface.Controller):
     def __init__(self, polyglot):
         super(Controller, self).__init__(polyglot)
         self.name = 'Twinkly'
-        self.initialized = False
         self.queryON = False
         self.host = ""
-        self.tries = 0
         self.hb = 0
 
     def start(self):
@@ -61,16 +59,18 @@ class Controller(polyinterface.Controller):
         except Exception as ex:
             LOGGER.error('Error starting Twinkly NodeServer: %s', str(ex))
            
-
     def shortPoll(self):
         self.setDriver('ST', 1)
-        self.reportDrivers()
         for node in self.nodes:
             if  self.nodes[node].queryON == True :
-                self.nodes[node].query()
+                self.nodes[node].update()
                 
     def longPoll(self):
         self.heartbeat()
+        
+    def query(self):
+        for node in self.nodes:
+            self.nodes[node].reportDrivers()
 
     def heartbeat(self):
         LOGGER.debug('heartbeat: hb={}'.format(self.hb))
@@ -114,7 +114,7 @@ class Controller(polyinterface.Controller):
 
     id = 'controller'
     commands = {
-        'QUERY': shortPoll,
+        'QUERY': query,
         'DISCOVER': discover,
         'INSTALL_PROFILE': install_profile,
     }
@@ -129,37 +129,39 @@ class TwinklyLight(polyinterface.Node):
         self.myHost = host
 
     def start(self):
-        self.query()
+        self.update()
+
+    def query(self):
+        self.reportDrivers()
 
     def setOn(self, command):
         try:
             asyncio.run(self._turnOn())
-            self.setDriver('ST', 100,True)
+            self.setDriver('ST', 100)
         except Exception as ex:
             LOGGER.error('setOn: %s', str(ex))
         
     def setOff(self, command):
         try :
             asyncio.run(self._turnOff())
-            self.setDriver('ST', 0,True)
+            self.setDriver('ST', 0)
         except Exception as ex:
             LOGGER.error('setOff: %s', str(ex))
     
     def setBrightness(self, command):
         try:
             asyncio.run(self._setBrightness(int(command.get('value'))))
-            self.setDriver('GV1', int(command.get('value')),True)
+            self.setDriver('GV1', int(command.get('value')))
         except Exception as ex:
             LOGGER.error('setBrightness: %s', str(ex))
         
-    def query(self):
+    def update(self):
         try :
             if ( asyncio.run(self._isOn()) ) :
-                self.setDriver('ST', 100,True)
+                self.setDriver('ST', 100)
             else :
-                self.setDriver('ST', 0,True)
-            self.setDriver('GV1', asyncio.run(self._getBri()) , True)
-            self.reportDrivers()
+                self.setDriver('ST', 0)
+            self.setDriver('GV1', asyncio.run(self._getBri()))
         except Exception as ex :
             LOGGER.error('query: %s', str(ex))
 
