@@ -163,7 +163,7 @@ class TwinklyLight(polyinterface.Node):
                 self.setDriver('ST', 0)
             self.setDriver('GV1', asyncio.run(self._getBri()))
         except Exception as ex :
-            LOGGER.error('query: %s', str(ex))
+            LOGGER.error('update: %s', str(ex))
 
     async def _isOn(self) : 
         cs = ClientSession(raise_for_status=True, timeout=ClientTimeout(total=3))
